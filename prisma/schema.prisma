@@ -1,0 +1,47 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// npx prisma migrate dev first --name init- Saves sql statements 
+// npx prisma migrate push - saves sql statements but doesn't save them
+// npx prisma migrate deploy - deploys them
+
+// changes
+//npx prisma generate
+// npx prisma migrate dev --name name_change
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  name      String?   
+  password  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  // posts     Post[]
+}
+
+//Table of data
+model Employee {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  name      String?   
+  role      Role
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  // posts     Post[]
+}
+
+enum Role {
+  ADMIN
+  INTERN
+  ENGINEER
+}
