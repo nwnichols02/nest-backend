@@ -1,9 +1,17 @@
-import { NestFactory } from '@nestjs/core';
+import { HttpAdapterHost, NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import ws from 'ws';
+import { MyLoggerService } from './my-logger/my-logger.service';
+import { AllExceptionsFilter } from './all-exceptions.filter';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+
+  const { httpAdapter } = app.get(HttpAdapterHost) 
+  app.useGlobalFilters(new AllExceptionsFilter(httpAdapter))
+
+  app.useLogger(app.get(MyLoggerService));
+  app.enableCors();
+  app.setGlobalPrefix('api');
   await app.listen(3001);
   // const server = new ws.Server({ port: 3002 });
 

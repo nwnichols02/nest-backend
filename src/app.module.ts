@@ -7,10 +7,37 @@ import { DatabaseModule } from './database/database.module';
 import { EmployeesModule } from './employees/employees.module';
 import { ChatWayGateway } from './chat-way/chat-way.gateway';
 import HttpControllerController from './http-controller/http-controller.controller';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
+import { MyLoggerModule } from './my-logger/my-logger.module';
 
 @Module({
-  imports: [UsersModule, DatabaseModule, EmployeesModule],
+  imports: [
+    ThrottlerModule.forRoot([
+      {
+        name: 'short',
+        ttl: 1000,
+        limit: 3,
+      }, 
+      {
+        name: 'long',
+        ttl: 60000,
+        limit: 100,
+      }
+    ]),
+  
+    UsersModule,
+    DatabaseModule,
+    EmployeesModule,
+    MyLoggerModule
+  ],
   controllers: [AppController, HttpControllerController, DogsController],
-  providers: [AppService, ChatWayGateway],
+  providers: [
+    AppService,
+    ChatWayGateway,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard
+    }],
 })
-export class AppModule {}
+export class AppModule { }
